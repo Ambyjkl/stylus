@@ -626,6 +626,14 @@ select {
   contain: layout style;
 }
 
+.newUI .target[data-type="exclusions"] {
+  color: #d22;
+}
+
+.newUI .target[data-type="exclusions"] img {
+  float: left;
+}
+
 .newUI .applies-to .expander {
   margin: 0;
   cursor: pointer;

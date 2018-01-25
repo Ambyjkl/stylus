@@ -35,6 +35,7 @@
     <script src="edit/sections.js"></script>
     <script src="edit/show-keymap-help.js"></script>
     <script src="edit/codemirror-editing-hooks.js"></script>
+    <script src="edit/exclusions.js"></script>
     <script src="edit/edit.js"></script>
 
     <script src="msgbox/msgbox.js" async></script>
@@ -370,6 +371,20 @@
             </div>
           <a id="linter-settings" href="#" class="svg-inline-wrapper" i18n-title="linterConfigTooltip">
             <svg class="svg-icon settings"><use xlink:href="#svg-icon-settings"/></svg>
+          </a>
+        </div>
+      </details>
+      <details id="exclusions" data-pref="editor.exclusions.expanded">
+        <summary>
+          <h2 i18n-text="exclusionsHeader">: <span id="excluded-stats"></span></h2>
+        </summary>
+        <select id="excluded-list" class="style-contributor" size="4" multiple="true"></select>
+        <div id="excluded-wrap">
+          <button id="excluded-list-add" i18n-text="genericAdd"></button>
+          <button id="excluded-list-edit" i18n-text="genericEdit"></button>
+          <button id="excluded-list-delete" i18n-text="genericDelete"></button>
+          <a id="excluded-list-help" href="#" class="svg-inline-wrapper">
+            <svg class="svg-icon info"><use xlink:href="#svg-icon-help"/></svg>
           </a>
         </div>
       </details>

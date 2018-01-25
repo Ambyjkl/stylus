@@ -7,6 +7,7 @@ global setupCodeMirror
 global beautify
 global initWithSectionStyle addSections removeSection getSectionsHashes
 global sectionsToMozFormat
+global exclusions
 */
 'use strict';
 
@@ -45,6 +46,7 @@ Promise.all([
   $('#lint').addEventListener('scroll', hideLintHeaderOnScroll, {passive: true});
   window.addEventListener('resize', () => debounce(rememberWindowSize, 100));
 
+  exclusions.init(style);
   if (usercss) {
     editor = createSourceEditor(style);
   } else {
@@ -161,7 +163,7 @@ function onRuntimeMessage(request) {
           request.reason !== 'config') {
         // code-less style from notifyAllTabs
         const {sections, id} = request.style;
-        ((sections[0] || {}).code === null
+        ((sections && sections[0] || {}).code === null
           ? API.getStyles({id})
           : Promise.resolve([request.style])
         ).then(([style]) => {
@@ -282,14 +284,19 @@ function initHooks() {
   }
 }
 
+function getNodeValue(node) {
+  // return length of exclusions; or the node value
+  return node.id === 'excluded-list' ? node.children.length.toString() : node.value;
+}
+
 function onChange(event) {
   const node = event.target;
   if ('savedValue' in node) {
-    const currentValue = node.type === 'checkbox' ? node.checked : node.value;
+    const currentValue = node.type === 'checkbox' ? node.checked : getNodeValue(node);
     setCleanItem(node, node.savedValue === currentValue);
   } else {
     // the manually added section's applies-to is dirty only when the value is non-empty
-    setCleanItem(node, node.localName !== 'input' || !node.value.trim());
+    setCleanItem(node, node.localName !== 'input' || !getNodeValue(node).trim());
     // only valid when actually saved
     delete node.savedValue;
   }
@@ -312,7 +319,7 @@ function setCleanItem(node, isClean) {
     if (node.CodeMirror) {
       node.savedValue = node.CodeMirror.changeGeneration();
     } else {
-      node.savedValue = node.type === 'checkbox' ? node.checked : node.value;
+      node.savedValue = node.type === 'checkbox' ? node.checked : getNodeValue(node);
     }
   } else {
     dirty[node.id] = true;
@@ -355,7 +362,8 @@ function save() {
     name: $('#name').value.trim(),
     enabled: $('#enabled').checked,
     reason: 'editSave',
-    sections: getSectionsHashes()
+    sections: getSectionsHashes(),
+    exclusions: exclusions.get()
   })
   .then(style => {
     styleId = style.id;
